@@ -1,15 +1,6 @@
-import Minio from 'minio';
-import { MINIO_BUCKET, MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_PORT, MINIO_SECRET_KEY } from '$env/static/private';
-import { error, json } from '@sveltejs/kit';
+import { MINIO_BUCKET } from '$env/static/private';
+import minioClient from '$lib/minio';
 import type { BucketItem } from 'minio';
-
-const minioClient = new Minio.Client({
-  endPoint: MINIO_ENDPOINT,
-  port: Number(MINIO_PORT),
-  useSSL: false,
-  accessKey: MINIO_ACCESS_KEY,
-  secretKey: MINIO_SECRET_KEY
-});
 
 // Event Stream? https://stackoverflow.com/a/74336207
 export async function load() {
@@ -17,10 +8,12 @@ export async function load() {
 
   const list: BucketItem[] = [];
 
-  let res: (value: BucketItem[]) => void;
+  let resolve: (value: BucketItem[]) => void;
+  let reject: (reason: string) => void;
 
-  const listPromise = () => new Promise<BucketItem[]>((resolve, reject) => {
-    res = resolve;
+  const listPromise = () => new Promise<BucketItem[]>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
   });
 
   listStream.on('data', function (obj) {
@@ -29,13 +22,13 @@ export async function load() {
   })
   listStream.on('error', function (e) {
     console.error(e);
-    throw error(400, e.message);
+    reject(e.message);
   });
 
-  listStream.on('end', async function (e) {
-    console.log(list);
-    res(list);
+  listStream.on('end', function () {
+    resolve(list);
   });
 
-  return { streaming: { list: listPromise() } }
+  // https://kit.svelte.dev/docs/load#streaming-with-promises
+  return { streaming: { listPromise: listPromise() } }
 }
