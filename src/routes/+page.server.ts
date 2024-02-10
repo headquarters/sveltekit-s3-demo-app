@@ -3,7 +3,9 @@ import minioClient from '$lib/minio';
 import type { BucketItem } from 'minio';
 
 // Event Stream? https://stackoverflow.com/a/74336207
-export async function load() {
+export async function load({ depends }) {
+  depends('s3:list');
+
   const listStream = minioClient.listObjectsV2(MINIO_BUCKET, '');
 
   const list: BucketItem[] = [];

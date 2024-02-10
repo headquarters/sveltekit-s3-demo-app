@@ -1,11 +1,10 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { invalidate } from '$app/navigation';
 
 	export let data: PageData;
 
 	let downloadAnchor: HTMLAnchorElement | undefined;
-
-	const { listPromise } = data.streaming;
 
 	async function downloadObject(name: string | undefined) {
 		if (!name) {
@@ -52,6 +51,7 @@
 		xhr.onreadystatechange = () => {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				console.log('ready state change', xhr.responseText); // handle response.
+				invalidate('s3:list');
 			}
 		};
 
@@ -60,6 +60,8 @@
 
 		console.log(name, url);
 	}
+
+	$: ({ listPromise } = data.streaming);
 </script>
 
 <h1>S3 Demo</h1>
