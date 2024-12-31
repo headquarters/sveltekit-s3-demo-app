@@ -2,16 +2,16 @@
 	import type { PageData } from './$types';
 	import { invalidate } from '$app/navigation';
 
-	// import {
-	// 	Table,
-	// 	TableBody,
-	// 	TableBodyCell,
-	// 	TableBodyRow,
-	// 	TableHead,
-	// 	TableHeadCell,
-	// 	Checkbox,
-	// 	TableSearch
-	// } from 'flowbite-svelte';
+	import {
+		Table,
+		TableBody,
+		TableBodyCell,
+		TableBodyRow,
+		TableHead,
+		TableHeadCell,
+		Checkbox,
+		TableSearch
+	} from 'flowbite-svelte';
 
 	interface Props {
 		data: PageData;
@@ -84,34 +84,30 @@
 	{#await listPromise}
 		Loading...
 	{:then list}
-		<table>
-			<thead>
-				<tr>
-				<td>Actions</td>
-				<td>Name</td>
-				<td>Last modified</td>
-				<td>Etag</td>
-				<td>Size</td>
-			</tr>
-			</thead>
-			<tbody>
+		<Table>
+			<TableHead>
+				<TableHeadCell>Actions</TableHeadCell>
+				<TableHeadCell>Name</TableHeadCell>
+				<TableHeadCell>Last modified</TableHeadCell>
+				<TableHeadCell>Etag</TableHeadCell>
+				<TableHeadCell>Size</TableHeadCell>
+			</TableHead>
 			{#each list as object}
-				<tr>
-					<td
-						><button onclick={() => downloadObject(object.name)}>Download</button></td
+				<TableBodyRow>
+					<TableBodyCell
+						><button onclick={() => downloadObject(object.name)}>Download</button></TableBodyCell
 					>
-					<td>{object.name}</td>
-					<td>{object.lastModified}</td>
-					<td>{object.etag}</td>
-					<td>{object.size}</td>
-				</tr>
+					<TableBodyCell>{object.name}</TableBodyCell>
+					<TableBodyCell>{object.lastModified}</TableBodyCell>
+					<TableBodyCell>{object.etag}</TableBodyCell>
+					<TableBodyCell>{object.size}</TableBodyCell>
+				</TableBodyRow>
 			{:else}
-				<tr>
-					<td colspan="5">No objects in bucket.</td>
-				</tr>
+				<TableBodyRow>
+					<TableBodyCell colspan="5">No objects in bucket.</TableBodyCell>
+				</TableBodyRow>
 			{/each}
-		</tbody>
-	</table>
+		</Table>
 		<!-- svelte-ignore a11y_invalid_attribute -->
 		<!-- svelte-ignore a11y_missing_content -->
 		<a href="" download class="hidden" bind:this={downloadAnchor}></a>
