@@ -2,20 +2,24 @@
 	import type { PageData } from './$types';
 	import { invalidate } from '$app/navigation';
 
-	import {
-		Table,
-		TableBody,
-		TableBodyCell,
-		TableBodyRow,
-		TableHead,
-		TableHeadCell,
-		Checkbox,
-		TableSearch
-	} from 'flowbite-svelte';
+	// import {
+	// 	Table,
+	// 	TableBody,
+	// 	TableBodyCell,
+	// 	TableBodyRow,
+	// 	TableHead,
+	// 	TableHeadCell,
+	// 	Checkbox,
+	// 	TableSearch
+	// } from 'flowbite-svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let downloadAnchor: HTMLAnchorElement | undefined;
+	let { data }: Props = $props();
+
+	let downloadAnchor: HTMLAnchorElement | undefined = $state();
 
 	async function downloadObject(name: string | undefined) {
 		if (!name) {
@@ -72,7 +76,7 @@
 		console.log(name, url);
 	}
 
-	$: ({ listPromise } = data.streaming);
+	let { listPromise } = $derived(data.streaming);
 </script>
 
 <h1 class="text-xl">S3 Demo</h1>
@@ -80,36 +84,40 @@
 	{#await listPromise}
 		Loading...
 	{:then list}
-		<Table>
-			<TableHead>
-				<TableHeadCell>Actions</TableHeadCell>
-				<TableHeadCell>Name</TableHeadCell>
-				<TableHeadCell>Last modified</TableHeadCell>
-				<TableHeadCell>Etag</TableHeadCell>
-				<TableHeadCell>Size</TableHeadCell>
-			</TableHead>
+		<table>
+			<thead>
+				<tr>
+				<td>Actions</td>
+				<td>Name</td>
+				<td>Last modified</td>
+				<td>Etag</td>
+				<td>Size</td>
+			</tr>
+			</thead>
+			<tbody>
 			{#each list as object}
-				<TableBodyRow>
-					<TableBodyCell
-						><button on:click={() => downloadObject(object.name)}>Download</button></TableBodyCell
+				<tr>
+					<td
+						><button onclick={() => downloadObject(object.name)}>Download</button></td
 					>
-					<TableBodyCell>{object.name}</TableBodyCell>
-					<TableBodyCell>{object.lastModified}</TableBodyCell>
-					<TableBodyCell>{object.etag}</TableBodyCell>
-					<TableBodyCell>{object.size}</TableBodyCell>
-				</TableBodyRow>
+					<td>{object.name}</td>
+					<td>{object.lastModified}</td>
+					<td>{object.etag}</td>
+					<td>{object.size}</td>
+				</tr>
 			{:else}
-				<TableBodyRow>
-					<TableBodyCell colspan="5">No objects in bucket.</TableBodyCell>
-				</TableBodyRow>
+				<tr>
+					<td colspan="5">No objects in bucket.</td>
+				</tr>
 			{/each}
-		</Table>
-		<!-- svelte-ignore a11y-invalid-attribute -->
-		<!-- svelte-ignore a11y-missing-content -->
-		<a href="" download class="hidden" bind:this={downloadAnchor} />
+		</tbody>
+	</table>
+		<!-- svelte-ignore a11y_invalid_attribute -->
+		<!-- svelte-ignore a11y_missing_content -->
+		<a href="" download class="hidden" bind:this={downloadAnchor}></a>
 
 		<br />
-		<input type="file" on:change={uploadObject} />
+		<input type="file" onchange={uploadObject} />
 	{:catch error}
 		Error loading object list: {error.message}
 	{/await}
