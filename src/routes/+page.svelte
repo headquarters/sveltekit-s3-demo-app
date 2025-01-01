@@ -13,9 +13,13 @@
 		TableSearch
 	} from 'flowbite-svelte';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let downloadAnchor: HTMLAnchorElement | undefined;
+	let { data }: Props = $props();
+
+	let downloadAnchor: HTMLAnchorElement | undefined = $state();
 
 	async function downloadObject(name: string | undefined) {
 		if (!name) {
@@ -72,7 +76,7 @@
 		console.log(name, url);
 	}
 
-	$: ({ listPromise } = data.streaming);
+	let { listPromise } = $derived(data.streaming);
 </script>
 
 <h1 class="text-xl">S3 Demo</h1>
@@ -91,7 +95,7 @@
 			{#each list as object}
 				<TableBodyRow>
 					<TableBodyCell
-						><button on:click={() => downloadObject(object.name)}>Download</button></TableBodyCell
+						><button onclick={() => downloadObject(object.name)}>Download</button></TableBodyCell
 					>
 					<TableBodyCell>{object.name}</TableBodyCell>
 					<TableBodyCell>{object.lastModified}</TableBodyCell>
@@ -104,12 +108,12 @@
 				</TableBodyRow>
 			{/each}
 		</Table>
-		<!-- svelte-ignore a11y-invalid-attribute -->
-		<!-- svelte-ignore a11y-missing-content -->
-		<a href="" download class="hidden" bind:this={downloadAnchor} />
+		<!-- svelte-ignore a11y_invalid_attribute -->
+		<!-- svelte-ignore a11y_missing_content -->
+		<a href="" download class="hidden" bind:this={downloadAnchor}></a>
 
 		<br />
-		<input type="file" on:change={uploadObject} />
+		<input type="file" onchange={uploadObject} />
 	{:catch error}
 		Error loading object list: {error.message}
 	{/await}

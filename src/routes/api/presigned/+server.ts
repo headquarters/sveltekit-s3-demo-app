@@ -7,7 +7,7 @@ export async function GET({ url }) {
   const method = url.searchParams.get('method') || 'GET';
 
   if (!object) {
-    throw error(400, { message: 'Missing `object` query parameter.' });
+    error(400, { message: 'Missing `object` query parameter.' });
   }
 
   const options = method === 'GET' ? { "Content-Disposition": "attachment" } : {};

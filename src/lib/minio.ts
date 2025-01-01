@@ -1,4 +1,4 @@
-import Minio from 'minio';
+import * as Minio from 'minio';
 import { MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_PORT, MINIO_SECRET_KEY } from '$env/static/private';
 
 const minioClient = new Minio.Client({
